@@ -68,6 +68,12 @@ function addDepartment() {
 }
 
 function addRole() {
+  let departmentChoices = rows.map((department) => {
+    return {
+      name: department.department_name,
+      value: department.id,
+    };
+  });
   inquirer
     .prompt([
       {
@@ -84,17 +90,7 @@ function addRole() {
         type: "list",
         name: "department",
         message: "Which department does this role belong to?",
-        choices: [
-          db.query(
-            `SELECT id, department_name FROM departments`,
-            (err, rows) => {
-              if (err) {
-                throw err;
-              }
-              console.log(rows);
-            }
-          ),
-        ],
+        choices: [departmentChoices],
       },
     ])
     .then((answers) => {
