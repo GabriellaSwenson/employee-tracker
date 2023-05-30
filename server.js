@@ -1,11 +1,5 @@
-const express = require("express");
+const inquirer = require("inquirer");
 const mysql = require("mysql2");
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 
 const db = mysql.createConnection(
   {
@@ -17,77 +11,170 @@ const db = mysql.createConnection(
   console.log(`Connected to the company_db database.`)
 );
 
-app.post("/api/new-department", ({ body }, res) => {
-  const sql = `INSERT INTO department (department_name)
-    VALUES (?)`;
-  const params = [body.department_name];
-
-  db.query(sql, params, (err, result) => {
+function viewDepartments() {
+  db.query(`SELECT id, department_name FROM departments`, (err, rows) => {
     if (err) {
-      res.status(400).json({ error: err.message });
-      return;
+      throw err;
     }
-    res.json({
-      message: "success",
-      data: body,
+    console.log(rows);
+  });
+}
+
+function viewRoles() {
+  db.query(
+    `SELECT id, title, salary, department_id FROM roles`,
+    (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      console.log(rows);
+    }
+  );
+}
+
+function viewEmployees() {
+  db.query(
+    `SELECT id, first_name, last_name, role_id, manager_id FROM employees`,
+    (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      console.log(rows);
+    }
+  );
+}
+
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "addDepartment",
+        message: "What is the name of the department?",
+      },
+    ])
+    .then((answers) => {
+      db.query(
+        "INSERT INTO departments (department_name) VALUES (?)",
+        [answers.addDepartment],
+        (err, rows) => {
+          if (err) {
+            throw err;
+          }
+          console.log(rows);
+        }
+      );
     });
-  });
-});
+}
 
-app.get("/api/department", (req, res) => {
-  const sql = `SELECT id, department_name AS title FROM department`;
-
-  db.query(sql, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: "success",
-      data: rows,
+function addRole() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "addRole",
+        message: "What is the name of the role?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary for this role?",
+      },
+      {
+        type: "list",
+        name: "department",
+        message: "Which department does this role belong to?",
+        choices: [
+          db.query(
+            `SELECT id, department_name FROM departments`,
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+              console.log(rows);
+            }
+          ),
+        ],
+      },
+    ])
+    .then((answers) => {
+      db.query(
+        "INSERT INTO roles (title) VALUES (?)",
+        [answers.addRole],
+        (err, rows) => {
+          if (err) {
+            throw err;
+          }
+          console.log(rows);
+        }
+      );
+      db.query(
+        "INSERT INTO roles (salary) VALUES (?)",
+        [answers.salary],
+        (err, rows) => {
+          if (err) {
+            throw err;
+          }
+          console.log(rows);
+        }
+      );
+      db.query(
+        "INSERT INTO roles (department_id) VALUES (?)",
+        [answers.department],
+        (err, rows) => {
+          if (err) {
+            throw err;
+          }
+          console.log(rows);
+        }
+      );
     });
-  });
-});
+}
 
-app.delete("/api/department/:id", (req, res) => {
-  const sql = `DELETE FROM department WHERE id = ?`;
-  const params = [req.params.id];
+addRole();
 
-  db.query(sql, params, (err, result) => {
-    if (err) {
-      res.statusMessage(400).json({ error: res.message });
-    } else if (!result.affectedRows) {
-      res.json({
-        message: "Department not found",
-      });
-    } else {
-      res.json({
-        message: "deleted",
-        changes: result.affectedRows,
-        id: req.params.id,
-      });
-    }
-  });
-});
+// const sql = `INSERT INTO departments (department_name)
+//     VALUES (?)`;
+// const params = [body.department_name];
 
-app.get("/api/department", (req, res) => {
-  const sql = `SELECT department.department_name AS department, role.role FROM role LEFT JOIN department ON role.department_id = department.id ORDER BY department.department_name;`;
-  db.query(sql, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: "success",
-      data: rows,
-    });
-  });
-});
+// db.query(sql, params, (err, result) => {
+//   if (err) {
+//     res.status(400).json({ error: err.message });
+//     return;
+//   }
+//   res.json({
+//     message: "success",
+//     data: body,
+//   });
+// });
 
-app.use((req, res) => {
-  res.status(404).end();
-});
+// const sql = `DELETE FROM departments WHERE id = ?`;
+// const params = [req.params.id];
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// db.query(sql, params, (err, result) => {
+//   if (err) {
+//     res.statusMessage(400).json({ error: res.message });
+//   } else if (!result.affectedRows) {
+//     res.json({
+//       message: "Department not found",
+//     });
+//   } else {
+//     res.json({
+//       message: "deleted",
+//       changes: result.affectedRows,
+//       id: req.params.id,
+//     });
+//   }
+// });
+
+// const sql = `SELECT departments.department_name AS departments, role.role FROM role LEFT JOIN departments ON role.department_id = departments.id ORDER BY departments.department_name;`;
+// db.query(sql, (err, rows) => {
+//   if (err) {
+//     res.status(500).json({ error: err.message });
+//     return;
+//   }
+//   res.json({
+//     message: "success",
+//     data: rows,
+//   });
+// });
