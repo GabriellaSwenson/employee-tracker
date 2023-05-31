@@ -68,66 +68,147 @@ function addDepartment() {
 }
 
 function addRole() {
-  let departmentChoices = rows.map((department) => {
+  db.query(`SELECT id, department_name FROM departments`, (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    let departmentChoices = rows.map((department) => {
+      return {
+        name: department.department_name,
+        value: department.id,
+      };
+    });
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "addRole",
+          message: "What is the name of the role?",
+        },
+        {
+          type: "input",
+          name: "salary",
+          message: "What is the salary for this role?",
+        },
+        {
+          type: "list",
+          name: "department",
+          message: "Which department does this role belong to?",
+          choices: departmentChoices,
+        },
+      ])
+      .then((answers) => {
+        db.query(
+          "INSERT INTO roles (title) VALUES (?)",
+          [answers.addRole],
+          (err, rows) => {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+        db.query(
+          "INSERT INTO roles (salary) VALUES (?)",
+          [answers.salary],
+          (err, rows) => {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+        db.query(
+          "INSERT INTO roles (department_id) VALUES (?)",
+          [answers.department],
+          (err, rows) => {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+      });
+  });
+}
+
+function addEmployee() {
+  db.query(
+    `SELECT id, first_name, last_name, role_id, manager_id FROM employees`,
+    (err, rows) => {
+      if (err) {
+        throw err;
+      }
+    }
+  );
+  let roleChoices = rows.map((role) => {
     return {
-      name: department.department_name,
-      value: department.id,
+      name: role.role_name,
+      value: role.id,
     };
   });
   inquirer
     .prompt([
       {
         type: "input",
-        name: "addRole",
-        message: "What is the name of the role?",
+        name: "firstName",
+        message: "What is the first name of this employee?",
       },
       {
         type: "input",
-        name: "salary",
-        message: "What is the salary for this role?",
+        name: "lastName",
+        message: "What is the last name of this employee?",
       },
       {
         type: "list",
-        name: "department",
-        message: "Which department does this role belong to?",
-        choices: [departmentChoices],
+        name: "role",
+        message: "Which role does this employee have to?",
+        choices: roleChoices,
+      },
+      {
+        type: "input",
+        name: "managerID",
+        message: "What's their manager Id?",
       },
     ])
     .then((answers) => {
       db.query(
-        "INSERT INTO roles (title) VALUES (?)",
-        [answers.addRole],
+        "INSERT INTO employees (first_name) VALUES (?)",
+        [answers.firstName],
         (err, rows) => {
           if (err) {
             throw err;
           }
-          console.log(rows);
         }
       );
       db.query(
-        "INSERT INTO roles (salary) VALUES (?)",
-        [answers.salary],
+        "INSERT INTO employees (last_name) VALUES (?)",
+        [answers.lastName],
         (err, rows) => {
           if (err) {
             throw err;
           }
-          console.log(rows);
         }
       );
       db.query(
-        "INSERT INTO roles (department_id) VALUES (?)",
-        [answers.department],
+        "INSERT INTO employees (role_id) VALUES (?)",
+        [answers.role],
         (err, rows) => {
           if (err) {
             throw err;
           }
-          console.log(rows);
+        }
+      );
+      db.query(
+        "INSERT INTO employees (manager_id) VALUES (?)",
+        [answers.managerID],
+        (err, rows) => {
+          if (err) {
+            throw err;
+          }
         }
       );
     });
 }
 
-addRole();
+addEmployee();
 
 // const sql = `INSERT INTO departments (department_name)
 //     VALUES (?)`;
