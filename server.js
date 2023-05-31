@@ -68,65 +68,68 @@ function addDepartment() {
 }
 
 function addRole() {
-  db.query(`SELECT id, department_name FROM departments`, (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    let departmentChoices = rows.map((department) => {
-      return {
-        name: department.department_name,
-        value: department.id,
-      };
-    });
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          name: "addRole",
-          message: "What is the name of the role?",
-        },
-        {
-          type: "input",
-          name: "salary",
-          message: "What is the salary for this role?",
-        },
-        {
-          type: "list",
-          name: "department",
-          message: "Which department does this role belong to?",
-          choices: departmentChoices,
-        },
-      ])
-      .then((answers) => {
-        db.query(
-          "INSERT INTO roles (title) VALUES (?)",
-          [answers.addRole],
-          (err, rows) => {
-            if (err) {
-              throw err;
-            }
-          }
-        );
-        db.query(
-          "INSERT INTO roles (salary) VALUES (?)",
-          [answers.salary],
-          (err, rows) => {
-            if (err) {
-              throw err;
-            }
-          }
-        );
-        db.query(
-          "INSERT INTO roles (department_id) VALUES (?)",
-          [answers.department],
-          (err, rows) => {
-            if (err) {
-              throw err;
-            }
-          }
-        );
+  db.query(
+    `SELECT id, title, salary, department_name FROM departments`,
+    (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      let departmentChoices = rows.map((department) => {
+        return {
+          name: department.department_name,
+          value: department.id,
+        };
       });
-  });
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "addRole",
+            message: "What is the name of the role?",
+          },
+          {
+            type: "input",
+            name: "salary",
+            message: "What is the salary for this role?",
+          },
+          {
+            type: "list",
+            name: "department",
+            message: "Which department does this role belong to?",
+            choices: departmentChoices,
+          },
+        ])
+        .then((answers) => {
+          db.query(
+            "INSERT INTO roles (title) VALUES (?)",
+            [answers.addRole],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
+          db.query(
+            "INSERT INTO roles (salary) VALUES (?)",
+            [answers.salary],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
+          db.query(
+            "INSERT INTO roles (department_id) VALUES (?)",
+            [answers.department],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
+        });
+    }
+  );
 }
 
 function addEmployee() {
