@@ -139,76 +139,76 @@ function addEmployee() {
       if (err) {
         throw err;
       }
+      let roleChoices = rows.map((role) => {
+        return {
+          name: role.role_name,
+          value: role.id,
+        };
+      });
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "firstName",
+            message: "What is the first name of this employee?",
+          },
+          {
+            type: "input",
+            name: "lastName",
+            message: "What is the last name of this employee?",
+          },
+          {
+            type: "list",
+            name: "role",
+            message: "Which role does this employee have to?",
+            choices: roleChoices,
+          },
+          {
+            type: "input",
+            name: "managerID",
+            message: "What's their manager Id?",
+          },
+        ])
+        .then((answers) => {
+          db.query(
+            "INSERT INTO employees (first_name) VALUES (?)",
+            [answers.firstName],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
+          db.query(
+            "INSERT INTO employees (last_name) VALUES (?)",
+            [answers.lastName],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
+          db.query(
+            "INSERT INTO employees (role_id) VALUES (?)",
+            [answers.role],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
+          db.query(
+            "INSERT INTO employees (manager_id) VALUES (?)",
+            [answers.managerID],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
+        });
     }
   );
-  let roleChoices = rows.map((role) => {
-    return {
-      name: role.role_name,
-      value: role.id,
-    };
-  });
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "firstName",
-        message: "What is the first name of this employee?",
-      },
-      {
-        type: "input",
-        name: "lastName",
-        message: "What is the last name of this employee?",
-      },
-      {
-        type: "list",
-        name: "role",
-        message: "Which role does this employee have to?",
-        choices: roleChoices,
-      },
-      {
-        type: "input",
-        name: "managerID",
-        message: "What's their manager Id?",
-      },
-    ])
-    .then((answers) => {
-      db.query(
-        "INSERT INTO employees (first_name) VALUES (?)",
-        [answers.firstName],
-        (err, rows) => {
-          if (err) {
-            throw err;
-          }
-        }
-      );
-      db.query(
-        "INSERT INTO employees (last_name) VALUES (?)",
-        [answers.lastName],
-        (err, rows) => {
-          if (err) {
-            throw err;
-          }
-        }
-      );
-      db.query(
-        "INSERT INTO employees (role_id) VALUES (?)",
-        [answers.role],
-        (err, rows) => {
-          if (err) {
-            throw err;
-          }
-        }
-      );
-      db.query(
-        "INSERT INTO employees (manager_id) VALUES (?)",
-        [answers.managerID],
-        (err, rows) => {
-          if (err) {
-            throw err;
-          }
-        }
-      );
-    });
 }
 
 addEmployee();
