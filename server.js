@@ -11,6 +11,63 @@ const db = mysql.createConnection(
   console.log(`Connected to the company_db database.`)
 );
 
+db.connect(function (err) {
+  if (err) throw err;
+  startApp();
+});
+
+function startApp() {
+  console.log("Beginning app");
+  manageTeam;
+}
+
+function manageTeam() {
+  return inquirer
+    .prompt({
+      type: "list",
+      name: "choices",
+      message: "What would you like to do?",
+      choices: [
+        "View Departments",
+        "Add Department",
+        "View Roles",
+        "Add Role",
+        "View Employees",
+        "Add Employee",
+        "Finished",
+      ],
+    })
+    .then((choices) => {
+      switch (choices.options) {
+        case "View Departments":
+          viewDepartments();
+          break;
+
+        case "Add Department":
+          addDepartment();
+          break;
+
+        case "View Roles":
+          viewRoles();
+          break;
+
+        case "Add Role":
+          addRole();
+          break;
+
+        case "View Employees":
+          viewEmployees();
+          break;
+
+        case "Add Employee":
+          addEmployee();
+          break;
+        default:
+          finished();
+      }
+    });
+}
+
 function viewDepartments() {
   db.query(`SELECT id, department_name FROM departments`, (err, rows) => {
     if (err) {
@@ -69,7 +126,7 @@ function addDepartment() {
 
 function addRole() {
   db.query(
-    `SELECT id, title, salary, department_name FROM departments`,
+    `SELECT id, title, salary, department_id FROM roles`,
     (err, rows) => {
       if (err) {
         throw err;
@@ -84,7 +141,7 @@ function addRole() {
         .prompt([
           {
             type: "input",
-            name: "addRole",
+            name: "title",
             message: "What is the name of the role?",
           },
           {
@@ -94,33 +151,15 @@ function addRole() {
           },
           {
             type: "list",
-            name: "department",
+            name: "department_id",
             message: "Which department does this role belong to?",
             choices: departmentChoices,
           },
         ])
         .then((answers) => {
           db.query(
-            "INSERT INTO roles (title) VALUES (?)",
-            [answers.addRole],
-            (err, rows) => {
-              if (err) {
-                throw err;
-              }
-            }
-          );
-          db.query(
-            "INSERT INTO roles (salary) VALUES (?)",
-            [answers.salary],
-            (err, rows) => {
-              if (err) {
-                throw err;
-              }
-            }
-          );
-          db.query(
-            "INSERT INTO roles (department_id) VALUES (?)",
-            [answers.department],
+            "INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)",
+            [answers.title, answers.salary, answers.department_id],
             (err, rows) => {
               if (err) {
                 throw err;
@@ -149,57 +188,35 @@ function addEmployee() {
         .prompt([
           {
             type: "input",
-            name: "firstName",
+            name: "first_name",
             message: "What is the first name of this employee?",
           },
           {
             type: "input",
-            name: "lastName",
+            name: "last_name",
             message: "What is the last name of this employee?",
           },
           {
             type: "list",
-            name: "role",
+            name: "role_id",
             message: "Which role does this employee have to?",
             choices: roleChoices,
           },
           {
             type: "input",
-            name: "managerID",
+            name: "manager_id",
             message: "What's their manager Id?",
           },
         ])
         .then((answers) => {
           db.query(
-            "INSERT INTO employees (first_name) VALUES (?)",
-            [answers.firstName],
-            (err, rows) => {
-              if (err) {
-                throw err;
-              }
-            }
-          );
-          db.query(
-            "INSERT INTO employees (last_name) VALUES (?)",
-            [answers.lastName],
-            (err, rows) => {
-              if (err) {
-                throw err;
-              }
-            }
-          );
-          db.query(
-            "INSERT INTO employees (role_id) VALUES (?)",
-            [answers.role],
-            (err, rows) => {
-              if (err) {
-                throw err;
-              }
-            }
-          );
-          db.query(
-            "INSERT INTO employees (manager_id) VALUES (?)",
-            [answers.managerID],
+            "INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?)",
+            [
+              answers.firstName,
+              answers.last_name,
+              answers.role_id,
+              answers.manager_id,
+            ],
             (err, rows) => {
               if (err) {
                 throw err;
@@ -211,50 +228,7 @@ function addEmployee() {
   );
 }
 
-addEmployee();
-
-// const sql = `INSERT INTO departments (department_name)
-//     VALUES (?)`;
-// const params = [body.department_name];
-
-// db.query(sql, params, (err, result) => {
-//   if (err) {
-//     res.status(400).json({ error: err.message });
-//     return;
-//   }
-//   res.json({
-//     message: "success",
-//     data: body,
-//   });
-// });
-
-// const sql = `DELETE FROM departments WHERE id = ?`;
-// const params = [req.params.id];
-
-// db.query(sql, params, (err, result) => {
-//   if (err) {
-//     res.statusMessage(400).json({ error: res.message });
-//   } else if (!result.affectedRows) {
-//     res.json({
-//       message: "Department not found",
-//     });
-//   } else {
-//     res.json({
-//       message: "deleted",
-//       changes: result.affectedRows,
-//       id: req.params.id,
-//     });
-//   }
-// });
-
-// const sql = `SELECT departments.department_name AS departments, role.role FROM role LEFT JOIN departments ON role.department_id = departments.id ORDER BY departments.department_name;`;
-// db.query(sql, (err, rows) => {
-//   if (err) {
-//     res.status(500).json({ error: err.message });
-//     return;
-//   }
-//   res.json({
-//     message: "success",
-//     data: rows,
-//   });
-// });
+const finished = () => {
+  console.log("Finished");
+  process.exit();
+};
