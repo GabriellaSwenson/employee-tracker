@@ -65,19 +65,19 @@ function manageTeam() {
 }
 
 function viewDepartments() {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     db.query(`SELECT id, department_name FROM departments`, (err, rows) => {
       if (err) {
         throw err;
       }
       console.log(rows);
+      resolve();
     });
-    resolve();
   });
 }
 
 function viewRoles() {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     db.query(
       `SELECT id, title, salary, department_id FROM roles`,
       (err, rows) => {
@@ -85,14 +85,14 @@ function viewRoles() {
           throw err;
         }
         console.log(rows);
+        resolve();
       }
     );
-    resolve();
   });
 }
 
 function viewEmployees() {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     db.query(
       `SELECT id, first_name, last_name, role_id, manager_id FROM employees`,
       (err, rows) => {
@@ -100,14 +100,14 @@ function viewEmployees() {
           throw err;
         }
         console.log(rows);
+        resolve();
       }
     );
-    resolve();
   });
 }
 
 function addDepartment() {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     inquirer
       .prompt([
         {
@@ -125,15 +125,15 @@ function addDepartment() {
               throw err;
             }
             console.log(rows);
+            resolve();
           }
         );
       });
-    resolve();
   });
 }
 
 function addRole() {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     db.query(
       `SELECT id, title, salary, department_id FROM roles`,
       (err, rows) => {
@@ -173,17 +173,17 @@ function addRole() {
                 if (err) {
                   throw err;
                 }
+                resolve();
               }
             );
           });
       }
     );
-    resolve();
   });
 }
 
 function addEmployee() {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     db.query(
       `SELECT id, first_name, last_name, role_id, manager_id FROM employees`,
       (err, rows) => {
@@ -233,12 +233,12 @@ function addEmployee() {
                 if (err) {
                   throw err;
                 }
+                resolve();
               }
             );
           });
       }
     );
-    resolve();
   });
 }
 
