@@ -32,47 +32,38 @@ function manageTeam() {
         "Finished",
       ],
     })
-    .then((response) => {
+    .then(async (response) => {
       switch (response.choices) {
+        new Promise((resolve, reject) => {
         case "View Departments":
-          viewDepartments();
-          recurse();
+          await viewDepartments();
+          manageTeam();
+          break;
+          resolve()
+          });
+
 
         case "Add Department":
           addDepartment();
-          recurse();
+          break;
 
         case "View Roles":
           viewRoles();
-          recurse();
+          break;
 
         case "Add Role":
           addRole();
-          recurse();
+          break;
 
         case "View Employees":
           viewEmployees();
-          recurse();
+          break;
 
         case "Add Employee":
           addEmployee();
-          recurse();
+          break;
         default:
           finished();
-      }
-      function recurse() {
-        if (
-          (viewDepartments(),
-          addDepartment(),
-          viewRoles(),
-          addRole(),
-          viewEmployees(),
-          addEmployee)
-        ) {
-          recurse();
-        } else {
-          finished();
-        }
       }
     });
 }
