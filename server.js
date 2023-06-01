@@ -36,29 +36,43 @@ function manageTeam() {
       switch (response.choices) {
         case "View Departments":
           viewDepartments();
-          break;
+          recurse();
 
         case "Add Department":
           addDepartment();
-          break;
+          recurse();
 
         case "View Roles":
           viewRoles();
-          break;
+          recurse();
 
         case "Add Role":
           addRole();
-          break;
+          recurse();
 
         case "View Employees":
           viewEmployees();
-          break;
+          recurse();
 
         case "Add Employee":
           addEmployee();
-          break;
+          recurse();
         default:
           finished();
+      }
+      function recurse() {
+        if (
+          (viewDepartments(),
+          addDepartment(),
+          viewRoles(),
+          addRole(),
+          viewEmployees(),
+          addEmployee)
+        ) {
+          recurse();
+        } else {
+          finished();
+        }
       }
     });
 }
