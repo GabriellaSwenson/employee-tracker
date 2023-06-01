@@ -32,8 +32,8 @@ function manageTeam() {
         "Finished",
       ],
     })
-    .then((choices) => {
-      switch (choices.options) {
+    .then((response) => {
+      switch (response.choices) {
         case "View Departments":
           viewDepartments();
           break;
