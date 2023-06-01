@@ -13,13 +13,8 @@ const db = mysql.createConnection(
 
 db.connect(function (err) {
   if (err) throw err;
-  startApp();
+  manageTeam();
 });
-
-function startApp() {
-  console.log("Beginning app");
-  manageTeam;
-}
 
 function manageTeam() {
   return inquirer
